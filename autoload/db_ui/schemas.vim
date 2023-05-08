@@ -142,12 +142,13 @@ let s:oracle = {
       \ }
 
 let s:bigquery = {
+      \ 'callable': 'filter',
       \ 'args': ['--format=csv'],
       \ 'schemes_query': "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA",
       \ 'schemes_tables_query': "SELECT table_schema, table_name FROM `region-us`.INFORMATION_SCHEMA.TABLES",
       \ 'parse_results': {results, min_len -> s:results_parser(results[1:], ',', min_len)},
       \ 'layout_flag': '\\x',
-      \ 'requires_stdin': v:false,
+      \ 'requires_stdin': v:true,
       \ }
 
 
@@ -174,7 +175,8 @@ endfunction
 
 function! s:format_query(db, scheme, query) abort
   let conn = type(a:db) == v:t_string ? a:db : a:db.conn
-  let cmd = db#adapter#dispatch(conn, 'interactive') + get(a:scheme, 'args', [])
+  let callable = get(a:scheme, 'callable', 'interactive')
+  let cmd = db#adapter#dispatch(conn, callable) + get(a:scheme, 'args', [])
   if get(a:scheme, 'requires_stdin')
     return [cmd, a:query]
   endif
