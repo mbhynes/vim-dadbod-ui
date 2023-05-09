@@ -141,11 +141,22 @@ let s:oracle = {
       \   'filetype': 'plsql',
       \ }
 
+if !exists('g:db_adapter_bigquery_region')
+  let g:db_adapter_bigquery_region = 'region-us'
+endif
+
+let s:bigquery_schemas_query = "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA" 
+
+let s:bigquery_schema_tables_query = printf("
+      \ SELECT table_schema, table_name
+      \ FROM `%s`.INFORMATION_SCHEMA.TABLES
+      \ ", g:db_adapter_bigquery_region)
+
 let s:bigquery = {
       \ 'callable': 'filter',
       \ 'args': ['--format=csv'],
-      \ 'schemes_query': "SELECT schema_name FROM INFORMATION_SCHEMA.SCHEMATA",
-      \ 'schemes_tables_query': "SELECT table_schema, table_name FROM `region-us`.INFORMATION_SCHEMA.TABLES",
+      \ 'schemes_query': s:bigquery_schemas_query
+      \ 'schemes_tables_query': s:bigquery_schema_tables_query,
       \ 'parse_results': {results, min_len -> s:results_parser(results[1:], ',', min_len)},
       \ 'layout_flag': '\\x',
       \ 'requires_stdin': v:true,
