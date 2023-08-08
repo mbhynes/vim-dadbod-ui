@@ -155,7 +155,7 @@ let s:bigquery_schema_tables_query = printf("
 let s:bigquery = {
       \ 'callable': 'filter',
       \ 'args': ['--format=csv'],
-      \ 'schemes_query': s:bigquery_schemas_query
+      \ 'schemes_query': s:bigquery_schemas_query,
       \ 'schemes_tables_query': s:bigquery_schema_tables_query,
       \ 'parse_results': {results, min_len -> s:results_parser(results[1:], ',', min_len)},
       \ 'layout_flag': '\\x',
